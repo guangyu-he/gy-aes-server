@@ -1,0 +1,76 @@
+#!/bin/bash
+
+file=~/.hgyuser
+
+if [ ! -f "$file" ]; then
+	echo "first time using the script plz input your usercode(4 number):"
+	read user
+	#user=$((16#${usercode}))
+	echo "${user}" > ~/.hgyuser
+fi
+
+usercodeo=$(cat ~/.hgyuser)
+echo "input your usercode:"
+read usercode
+#usercodej=$((16#${usercodei}))
+
+if [ $usercode -eq $usercodeo ]; then
+	
+	let userl=${#usercode}
+	let sum=0
+	for ((b=0;b<userl;b++));do
+		uid[b]=${usercode:b:1}
+		#字符串分割
+		let sum=${sum}+${uid[b]}
+	done
+	#echo "$sum"
+	let sum=${sum}/${userl}
+	#echo "$sum"
+
+	echo "input your password:"
+	read password
+	let l=${#password}
+	#数值运算用let
+	#echo "${l}"
+
+	for ((a=0;a<l;a++));do
+		var[a]=${password:a:1}
+		#字符串分割
+		pass[a]=$(printf "%d" "'${var[a]}")
+		#转ascii
+		let pass[a]=pass[a]+sum
+		#echo "分割：${pass[a]}"
+	done
+
+	for ((a=0;a<l;a++));do
+		key[a]=$(printf \\x`printf %x ${pass[a]}`)
+		#转字符
+		#echo "${key[a]}"
+	done
+
+	for ((a=l-1;a>=0;a--));do
+		out=${out}${key[a]}
+		#字符串拼接
+	done
+
+	echo "encrypted：${out}"
+
+	echo "save to file? y/n"
+	read save
+	if [ ${save} = y ]; then
+		echo "nameforsavingfile?"
+		read savename
+		echo "save successful at ~/"
+		echo "${out}" > ~/hgycrypted-${savename}
+	else
+		echo "thanks for using!"
+	fi
+else
+	echo "wrong usercode"
+
+fi
+
+#word=$((16#${pass}))
+#echo "${word}"
+#转换为16进制
+
