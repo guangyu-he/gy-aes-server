@@ -23,7 +23,6 @@ if [ $mode -eq 1 ];then
 	if [ ! -f "$file" ];then
 		echo "first time using the script plz input your usercode(only number):"
 		read user
-		#user=$((16#${usercode}))
 		echo "${user}" > ~/.hgyuser
 	fi
 elif [ $mode -eq 2 ];then
@@ -41,6 +40,5 @@ elif [ $mode -eq 3 ]; then
 elif [ $mode -eq 4 ]; then
 	echo "input your usercode(only number):"
 	read user
-	#user=$((16#${usercode}))
 	echo "${user}" > ~/.hgyuser
 fi

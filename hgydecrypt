@@ -5,14 +5,12 @@ file=~/.hgyuser
 if [ ! -f "$file" ]; then
 	echo "first time using the script plz input your usercode(4 number):"
 	read user
-	#user=$((16#${usercode}))
 	echo "${user}" > ~/.hgyuser
 fi
 
 usercodeo=$(cat ~/.hgyuser)
 echo "input your usercode:"
 read usercode
-#usercodej=$((16#${usercodei}))
 
 if [ $usercode -eq $usercodeo ]; then
 
@@ -23,9 +21,7 @@ if [ $usercode -eq $usercodeo ]; then
 		#字符串分割
 		let sum=${sum}+${uid[b]}
 	done
-	#echo "$sum"
 	let sum=${sum}/${userl}
-	#echo "$sum"
 	
 	echo "decrypt from file or input? 1:file(from ~/) 2:input"
 	read mode
@@ -62,7 +58,9 @@ if [ $usercode -eq $usercodeo ]; then
 	done
 
 	echo "decrypted：${out}"
+	echo "thanks for using!--developed by Guangyu He,24.12.18"
 
 else
 	echo "wrong usercode"
+	echo "thanks for using!--developed by Guangyu He,24.12.18"
 fi
