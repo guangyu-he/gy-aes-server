@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: example
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  phppgadmin:
+    restart: unless-stopped
+    image: zhajor/docker-phppgadmin:latest
+    ports:
+      - "80:80"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+    depends_on:
+      - postgres
+volumes:
+  pgdata:
+
