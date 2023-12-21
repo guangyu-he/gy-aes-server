@@ -8,22 +8,21 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  phppgadmin:
+  adminer:
+    image: adminer
+    container_name: adminer
     restart: unless-stopped
-    image: zhajor/docker-phppgadmin:latest
-    ports:
-      - "8988:80"
-    environment:
-      - DB_HOST=postgres
-      - DB_PORT=5432
     depends_on:
-      - postgres
+      - db
+    ports:
+      - 8988:8080
 
   fastapi:
     restart: unless-stopped
+    container_name: fastapi
     build: .
     ports:
-      - "8989:8989"
+      - 8989:8989
     depends_on:
       - postgres
 
