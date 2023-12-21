@@ -51,11 +51,18 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return users
 
 
-@app.get("/users/{user_id}", response_model=schemas.User)
-def read_user(user_id: int, db: Session = Depends(get_db)):
-    db_user = crud.get_user(db, user_id=user_id)
+@app.get("/users/{user_id_or_email}", response_model=schemas.User)
+def read_user(user_id_or_email: int or str, password: str, db: Session = Depends(get_db)):
+    if isinstance(user_id_or_email, str):
+        # if '@' in user_id:
+        #     raise HTTPException(status_code=400, detail="Invalid user email")
+        db_user = crud.get_user_by_email(db, email=user_id_or_email)
+    else:
+        db_user = crud.get_user(db, user_id=user_id_or_email)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
+    if db_user.hashed_password != password:
+        raise HTTPException(status_code=400, detail="Invalid password")
     return db_user
 
 
