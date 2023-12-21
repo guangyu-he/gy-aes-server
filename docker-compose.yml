@@ -12,12 +12,21 @@ services:
     restart: unless-stopped
     image: zhajor/docker-phppgadmin:latest
     ports:
-      - "80:80"
+      - "8988:80"
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
     depends_on:
       - postgres
+
+  fastapi:
+    restart: unless-stopped
+    build: .
+    ports:
+      - "8989:8989"
+    depends_on:
+      - postgres
+
 volumes:
   pgdata:
 
