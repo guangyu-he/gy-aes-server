@@ -28,6 +28,14 @@ def create_user(db: Session, user: schemas.UserCreate):
     return db_user
 
 
+def update_user_aes_key(db: Session, user: schemas.User):
+    random_aes_key = generate_aes256_gcm_key()
+    user.aes_key = random_aes_key
+    db.commit()
+    db.refresh(user)
+    return user
+
+
 def get_items(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Item).offset(skip).limit(limit).all()
 
