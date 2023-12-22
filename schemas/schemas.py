@@ -2,15 +2,14 @@ from pydantic import BaseModel
 
 
 class ItemBase(BaseModel):
-    title: str
-    description: str | None = None
+    text: str
 
 
 class ItemCreate(ItemBase):
-    pass
+    iv: str
 
 
-class Item(ItemBase):
+class Item(ItemCreate):
     id: int
     owner_id: int
 
