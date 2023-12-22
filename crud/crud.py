@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from schemas import schemas
 from models import models
 
+from aes.aes_generator import generate_aes256_gcm_key
+
 
 def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
@@ -17,8 +19,9 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_user(db: Session, user: schemas.UserCreate):
-    fake_hashed_password = user.password + "notreallyhashed"
-    db_user = models.User(email=user.email, hashed_password=fake_hashed_password)
+    fake_hashed_password = user.password
+    random_aes_key = generate_aes256_gcm_key()
+    db_user = models.User(email=user.email, hashed_password=fake_hashed_password, aes_key=random_aes_key)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
