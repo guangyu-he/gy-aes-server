@@ -61,23 +61,45 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 #     return db_user
 
 
-@app.get("/login/{user_email}", response_model=schemas.User)
-def read_user(user_email: str, password: str, db: Session = Depends(get_db)):
-    db_user = crud.get_user_by_email(db, email=user_email)
+@app.post("/login/", response_model=schemas.User)
+def read_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_email(db, email=user.email)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    if db_user.hashed_password != password:
+    if db_user.hashed_password != user.password:
         raise HTTPException(status_code=400, detail="Invalid password")
     return db_user
 
 
-@app.get("/update_aes_key/{user_email}", response_model=schemas.User)
-def update_user(user_email: str, db: Session = Depends(get_db)):
+@app.post("/update_aes_key/", response_model=schemas.User)
+def update_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_email(db, email=user.email)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    if db_user.hashed_password != user.password:
+        raise HTTPException(status_code=400, detail="Invalid password")
+    db_user = crud.update_user_aes_key(db, user=db_user)
+    return db_user
+
+
+@app.post("/encrypt/", response_model=schemas.ItemCreate)
+def encrypt_item(user_email: str, item: schemas.ItemBase, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user_email)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    db_user = crud.update_user_aes_key(db, user=db_user)
-    return db_user
+
+    db_item = crud.create_user_item(db=db, item=item, user_model=db_user)
+    return db_item
+
+
+@app.post("/decrypt/")
+def decrypt_item(user_email: str, item: schemas.ItemCreate, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_email(db, email=user_email)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    db_item = crud.decrypt_user_item(item=item, user_model=db_user)
+    return db_item
 
 
 # @app.post("/users/{user_id}/items/", response_model=schemas.Item)
@@ -97,4 +119,4 @@ if __name__ == '__main__':
     import uvicorn
 
     # uvicorn.run(app, host='0.0.0.0', port=8989, ssl_keyfile="privkey.pem", ssl_certfile="cert.pem", reload=True)
-    uvicorn.run(app, host='0.0.0.0', port=8989, reload=True)
+    uvicorn.run(app, host='0.0.0.0', port=8989)

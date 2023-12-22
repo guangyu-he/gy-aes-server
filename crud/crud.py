@@ -4,6 +4,7 @@ from schemas import schemas
 from models import models
 
 from aes.aes_generator import generate_aes256_gcm_key
+from aes.aes_encrypt import aes_encrypt, aes_decrypt
 
 
 def get_user(db: Session, user_id: int):
@@ -40,9 +41,16 @@ def get_items(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Item).offset(skip).limit(limit).all()
 
 
-def create_user_item(db: Session, item: schemas.ItemCreate, user_id: int):
-    db_item = models.Item(**item.dict(), owner_id=user_id)
+def create_user_item(db: Session, item: schemas.ItemBase, user_model: models.User):
+    aes_dict: dict = aes_encrypt(item.text, user_model.aes_key)
+    db_item = models.Item(text=aes_dict['text'], iv=aes_dict['iv'], owner_id=user_model.id)
+    # db_item = models.Item(**item.dict(), owner_id=user_model.id)
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
     return db_item
+
+
+def decrypt_user_item(item: schemas.ItemCreate, user_model: models.User):
+    decrypted_text = aes_decrypt(item.iv, item.text, user_model.aes_key)
+    return decrypted_text
