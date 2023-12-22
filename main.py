@@ -99,7 +99,8 @@ def decrypt_item(user_email: str, item: schemas.ItemCreate, db: Session = Depend
         raise HTTPException(status_code=404, detail="User not found")
 
     db_item = crud.decrypt_user_item(item=item, user_model=db_user)
-    return db_item
+    response = Response(content=db_item, media_type="text/plain", status_code=200)
+    return response
 
 
 # @app.post("/users/{user_id}/items/", response_model=schemas.Item)
