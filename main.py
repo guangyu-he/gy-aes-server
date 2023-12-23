@@ -103,6 +103,27 @@ def decrypt_item(user_email: str, item: schemas.ItemCreate, db: Session = Depend
     return response
 
 
+@app.delete("/drop_user/")
+def drop_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_email(db, email=user.email)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    db_user = crud.drop_user(db, user=db_user)
+    response = Response(content=f"User {db_user.email} deleted", media_type="text/plain", status_code=200)
+    return response
+
+
+@app.delete("/drop_all_user_items/")
+def drop_all_user_items(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_email(db, email=user.email)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    db_user = crud.drop_all_user_items(db, user=db_user)
+    return db_user
+
+
 # @app.post("/users/{user_id}/items/", response_model=schemas.Item)
 # def create_item_for_user(
 #         user_id: int, item: schemas.ItemCreate, db: Session = Depends(get_db)

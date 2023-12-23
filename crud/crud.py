@@ -32,6 +32,7 @@ def create_user(db: Session, user: schemas.UserCreate):
 def update_user_aes_key(db: Session, user: schemas.User):
     random_aes_key = generate_aes256_gcm_key()
     user.aes_key = random_aes_key
+    db.query(models.Item).filter(models.Item.owner_id == user.id).delete()
     db.commit()
     db.refresh(user)
     return user
@@ -54,3 +55,16 @@ def create_user_item(db: Session, item: schemas.ItemBase, user_model: models.Use
 def decrypt_user_item(item: schemas.ItemCreate, user_model: models.User):
     decrypted_text = aes_decrypt(item.iv, item.text, user_model.aes_key)
     return decrypted_text
+
+
+def drop_user(db: Session, user: schemas.User):
+    db.delete(user)
+    db.commit()
+    return user
+
+
+def drop_all_user_items(db: Session, user: schemas.User):
+    db.query(models.Item).filter(models.Item.owner_id == user.id).delete()
+    db.commit()
+    db.refresh(user)
+    return user
